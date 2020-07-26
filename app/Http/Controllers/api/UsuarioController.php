@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 
 class UsuarioController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      * Exibir uma lista do recurso
@@ -14,18 +15,12 @@ class UsuarioController extends Controller
      */
     public function index()
     {
+        header('Content-type:application/json');
+        header("Accept: application/json");
+        header("charset=UTF-8");
+ 
         // rota principal
-        return Usuario::all();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     * Mostrar o formulário para criar um novo recurso
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return json_encode(Usuario::all());
     }
 
     /**
@@ -37,9 +32,17 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        Usuario::create($request->all());
-    }
+        /*
+        Podemos usar esta forma de encryption
+
+        https://www.tutorialspoint.com/laravel/laravel_encryption.htm#:~:text=The%20process%20of%20converting%20cipher%20text%20to%20plain,cannot%20be%20tampered%20with%20once%20it%20is%20encrypted.
+        
+        */
+        if ($request->isMethod('post')) {
+            Usuario::create($request->all());
+       }
+   }
+        
 
     /**
      * Display the specified resource.
@@ -50,20 +53,19 @@ class UsuarioController extends Controller
     public function show($id)
     {
         //
-
-        echo "hello";
-       //Usuario::findOrFail($id);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * Mostrar o formulário para editar o recurso especificado
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+       header('Content-type:application/json');
+       header("Accept: application/json");
+       header("charset=UTF-8");
+       
+       $usuario = Usuario::find($id);
+       if($usuario != NULL || $usuario != "")
+       {
+            json_encode($usuario);
+            echo "$usuario";
+       }else{
+            abort(404, 'Unauthorized action.');
+       }
+       
     }
 
     /**
@@ -76,6 +78,8 @@ class UsuarioController extends Controller
     public function update(Request $request, $id)
     {
         //
+        $usuario = Usuario::findOrFail($id);
+        $usuario->update($request->all());
     }
 
     /**
@@ -86,6 +90,14 @@ class UsuarioController extends Controller
      */
     public function destroy($id)
     {
-        //
+        /* 
+         0 true   1 false
+         inativo  ativo
+        */
+
+        $usuario = Usuario::findOrFail($id);
+        $usuario->status = 1;
+        $usuario->update();
+        //$usuario->delete();
     }
 }
