@@ -60,12 +60,16 @@ class UsuarioController extends Controller
        $usuario = Usuario::find($id);
        if($usuario != NULL || $usuario != "")
        {
-            json_encode($usuario);
-            echo "$usuario";
+            if($usuario->status == 'Ativo')
+            {
+              return json_encode($usuario);
+            }else{
+              return 'Contate o administrador do sistema.';
+            }
        }else{
-            abort(404, 'Unauthorized action.');
+            //abort(404, 'Unauthorized action.');
+            return 'Usuário não encontrado.';
        }
-       
     }
 
     /**
@@ -90,14 +94,13 @@ class UsuarioController extends Controller
      */
     public function destroy($id)
     {
-        /* 
-         0 true   1 false
-         inativo  ativo
-        */
+        /* Enum Status 'Ativo','Inativo','Bloqueado','Em Análise' */
 
         $usuario = Usuario::findOrFail($id);
-        $usuario->status = 1;
-        $usuario->update();
-        //$usuario->delete();
+            if($usuario->status != 'Inativo')
+            {
+             $usuario->status = 'Inativo';
+             $usuario->update();    
+            }
     }
 }

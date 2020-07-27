@@ -19,7 +19,7 @@ class CreateUsuariosTable extends Migration
             $table->string('email')->unique();
             $table->string('senha');
             $table->integer('perfil');
-            $table->boolean('status');
+            $table->enum('status', ['Ativo', 'Inativo','Bloqueado','Em Análise']);
             $table->rememberToken();
             $table->timestamps();
         });
