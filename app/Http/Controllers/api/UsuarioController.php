@@ -15,12 +15,8 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        header('Content-type:application/json');
-        header("Accept: application/json");
-        header("charset=UTF-8");
- 
-        // rota principal
-        return json_encode(Usuario::all());
+        $usuarios = Usuario::all();
+        return response()->json($usuarios);
     }
 
     /**
@@ -32,18 +28,19 @@ class UsuarioController extends Controller
      */
     public function store(Request $request)
     {
-        /*
-        Podemos usar esta forma de encryption
-
-        https://www.tutorialspoint.com/laravel/laravel_encryption.htm#:~:text=The%20process%20of%20converting%20cipher%20text%20to%20plain,cannot%20be%20tampered%20with%20once%20it%20is%20encrypted.
-        
-        */
         if ($request->isMethod('post')) {
-            Usuario::create($request->all());
+
+            $data = ['nome' => $request->nome,
+                     'email' => $request->email,
+                     'senha' => bcrypt($request->senha),
+                     'perfil' => $request->perfil,
+                     'status' => $request->status,
+                     'remember_token' => $request->remember_token];
+
+           Usuario::create($data);
        }
    }
         
-
     /**
      * Display the specified resource.
      * Exibe o recurso especificado.
@@ -52,17 +49,14 @@ class UsuarioController extends Controller
      */
     public function show($id)
     {
-        //
-       header('Content-type:application/json');
-       header("Accept: application/json");
-       header("charset=UTF-8");
-       
+
        $usuario = Usuario::find($id);
+
        if($usuario != NULL || $usuario != "")
        {
             if($usuario->status == 'Ativo')
             {
-              return json_encode($usuario);
+              return response()->json($usuario);
             }else{
               return 'Contate o administrador do sistema.';
             }
@@ -81,7 +75,6 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
         $usuario = Usuario::findOrFail($id);
         $usuario->update($request->all());
     }
